@@ -3,8 +3,10 @@ name: Release
 on:
   workflow_dispatch:
 
-permissions:
+permissions: # Be able to commit and publish packages
   contents: write
+  packages: write
+  actions: read
 
 jobs:
   build_release:
@@ -25,18 +27,15 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
           architecture: x64
-      - name: Setup and execute Gradle 'createConfluentArchive' task
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: createConfluentArchive
-          gradle-version: '7.4.2'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Publish package
         run: ./gradlew publish
         env:
-          GITHUB_TOKEN: ${{ secrets.PACKAGES_WRITE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_ACCESS_TOKEN_READ_PACKAGES: ${{ secrets.ACCESS_TOKEN_READ_PACKAGES }}
 
       - name: release
         uses: actions/create-release@v1
@@ -48,15 +47,6 @@ jobs:
           tag_name: ${{ env.RELEASE_VERSION }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
-      - name: upload release artifact
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/confluent/clickhouse-kafka-connect-${{ env.RELEASE_VERSION }}.zip
-          asset_name: clickhouse-kafka-connect-${{ env.RELEASE_VERSION }}.zip
-          asset_content_type: application/zip
 
       - name: Tag latest commit as release
         run: |
