@@ -211,7 +211,7 @@ publishing {
     repositories {
         maven {
             name = "AirthingsGitHubPackages"
-            url = uri("https://maven.pkg.github.com/airthings/lib-clickhouse-kafka-connect")
+            url = uri("https://maven.pkg.github.com/airthings/clickhouse-kafka-connect")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
