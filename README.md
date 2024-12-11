@@ -1,38 +1,52 @@
-# ClickHouse Kafka Connect Sink
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-## About
-clickhouse-kafka-connect is the official Kafka Connect sink connector for [ClickHouse](https://clickhouse.com/).
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-The Kafka connector delivers data from a Kafka topic to a ClickHouse table.
-## Documentation
+[![Airthings][logo]](https://www.airthings.com)
 
-See the [ClickHouse website](https://clickhouse.com/docs/en/integrations/kafka/clickhouse-kafka-connect-sink) for the full documentation entry.
+# clickhouse-kafka-connect
 
-## Design
-For a full overview of the design and how exactly-once delivery semantics are achieved, see the [design document](./docs/DESIGN.md).
+This repository is used to maintain the code base for the kotlin library clickhouse-kafka-connect.
+This code base in this repo is maintained by the Airthings kotlin_core_maintainers team. So please reach out to them before making any breaking changes.
 
-## Help
-For additional help, please [file an issue in the repository](https://github.com/ClickHouse/clickhouse-kafka-connect/issues) or raise a question in [ClickHouse public Slack](https://clickhouse.com/slack).
+[logo]: https://upload.wikimedia.org/wikipedia/commons/d/d1/Airthings_logo.svg
 
-## KeyToValue Transformation
-We've created a transformation that allows you to convert a Kafka message key into a value.
-This is useful when you want to store the key in a separate column in ClickHouse - by default, the column is `_key` and the type is String.
+# Contribute
+When a PR is made to this repository, make sure to add a label corresponding to the type of change you are making. The labels are:
+- `major` : For any breaking changes
+- `minor` : For any new features
+- `patch` : For any bug fixes
 
-```sql
-CREATE TABLE your_table_name
-(
-    `your_column_name` String,
-    ...
-    ...
-    ...
-    `_key` String
-) ENGINE = MergeTree()
-```
+## Installation
 
-Simply add the transformation to your connector configuration:
-    
-```properties
-transforms=keyToValue
-transforms.keyToValue.type=com.clickhouse.kafka.connect.transforms.KeyToValue
-transforms.keyToValue.field=_key
-```
+Declare the dependency in your `build.gradle` file:
+
+- Add this helper function
+    ```kotlin
+  fun RepositoryHandler.airthings(repository: String) = maven {
+    name = "com.airthings.github.packages"
+    url = uri("https://maven.pkg.github.com/Airthings/clickhouse-kafka-connect")
+    credentials {
+      username = env.fetchOrNull("GITHUB_USERNAME")
+        ?: System.getenv("GITHUB_USERNAME")
+        ?: System.getenv("GITHUB_ACTOR")
+      password = env.fetchOrNull("GITHUB_ACCESS_TOKEN_READ_PACKAGES")
+            ?: System.getenv("GITHUB_ACCESS_TOKEN_READ_PACKAGES")
+        }
+      }
+   ```
+
+- Add the repository
+    ```kotlin
+    repositories { airthings(repository = "clickhouse-kafka-connect") }
+    ```
+
+- Add the dependency using catalog
+    ```kotlin
+  dependencies { implementation(libs.airthings.replace.me) }
+  ```
+
+## Usage
+
+Use Example.client() to create a client instance.
