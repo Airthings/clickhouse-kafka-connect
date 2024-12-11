@@ -10,6 +10,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.net.URI
 
 val defaultJdkVersion = 17
 java {
@@ -35,9 +36,10 @@ plugins {
     id("com.github.gmazzo.buildconfig") version "5.5.0"
     id("com.diffplug.spotless") version "6.25.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("co.uzzu.dotenv.gradle") version "4.0.0" apply true
 }
 
-group = "com.clickhouse.kafka"
+group = "com.airthings.clickhouse"
 version = file("VERSION").readText().trim()
 description = "The official ClickHouse Apache Kafka Connect Connector."
 
@@ -259,4 +261,23 @@ tasks.register<Zip>("createConfluentArchive") {
     archiveAppendix.set(archiveFilename)
     archiveVersion.set(project.version.toString())
     destinationDirectory.set(file("$buildDir/confluent"))
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = URI("https://maven.pkg.github.com/airthings/clickhouse-kafka-connect")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+
+    publications {
+        register<MavenPublication>("gpr") {
+            from(components["java"])
+        }
+    }
 }
